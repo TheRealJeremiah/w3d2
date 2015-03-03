@@ -1,3 +1,5 @@
+require_relative 'classes'
+
 class QuestionLike
   attr_accessor :id, :question_id, :user_id
   def self.find_by_id(id)

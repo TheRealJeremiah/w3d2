@@ -1,3 +1,5 @@
+require_relative 'classes'
+
 class User
   attr_accessor :id, :fname, :lname
 
@@ -29,5 +31,17 @@ class User
 
   def initialize(user_hash)
     @id, @fname, @lname = user_hash.values_at('id', 'fname', 'lname')
+  end
+
+  def authored_questions
+    Question.find_by_author_id(id)
+  end
+
+  def authored_replies
+    Reply.find_by_user_id(id)
+  end
+
+  def followed_questions
+    QuestionFollow.followed_questions_for_user_id(id)
   end
 end
