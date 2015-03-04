@@ -3,6 +3,11 @@ require_relative 'classes'
 class User
   attr_accessor :id, :fname, :lname
 
+  include SaveObject
+  def self.table_name
+    @table_name = 'users'
+  end
+
   def self.find_by_id(id)
     user_result = QuestionsDatabase.instance.execute(<<-SQL, :id => id)
       SELECT
@@ -43,5 +48,23 @@ class User
 
   def followed_questions
     QuestionFollow.followed_questions_for_user_id(id)
+  end
+
+  def liked_questions
+    QuestionLike.liked_questions_for_user_id(id)
+  end
+
+  def average_karma
+    result = QuestionsDatabase.instance.execute(<<-SQL, :author_id => id)
+      SELECT
+        (CAST(COUNT(question_likes.user_id) AS FLOAT) / COUNT(DISTINCT(questions.id))) AS karma
+      FROM
+        questions
+      LEFT OUTER JOIN
+        question_likes on questions.id = question_likes.question_id
+      WHERE
+        questions.author = :author_id
+    SQL
+    result[0]['karma']
   end
 end

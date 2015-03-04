@@ -2,6 +2,12 @@ require_relative 'classes'
 
 class Reply
   attr_accessor :id, :body, :question_id, :user_id, :parent_id
+
+  include SaveObject
+  def self.table_name
+    @table_name = 'replies'
+  end
+
   def self.find_by_id(id)
     reply_result = QuestionsDatabase.instance.execute(<<-SQL, :id => id)
       SELECT

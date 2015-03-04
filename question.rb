@@ -2,6 +2,12 @@ require_relative 'classes'
 
 class Question
   attr_accessor :id, :title, :body, :author
+
+  include SaveObject
+  def self.table_name
+    @table_name = 'questions'
+  end
+
   def self.find_by_id(id)
     result = QuestionsDatabase.instance.execute(<<-SQL, :id => id)
       SELECT
@@ -28,6 +34,14 @@ class Question
     results.map { |result| Question.new(result) }
   end
 
+  def self.most_followed(n)
+    QuestionFollow.most_followed_questions(n)
+  end
+
+  def self.most_liked(n)
+    QuestionLike.most_liked_questions(n)
+  end
+
   def initialize(question_hash)
     @id, @title, @body, @author = question_hash.values_at('id', 'title', 'body', 'author')
   end
@@ -42,5 +56,13 @@ class Question
 
   def followers
     QuestionFollow.followers_for_question_id(id)
+  end
+
+  def likers
+    QuestionLike.likers_for_question_id(id)
+  end
+
+  def num_likes
+    QuestionLike.num_likes_for_question_id(id)
   end
 end
